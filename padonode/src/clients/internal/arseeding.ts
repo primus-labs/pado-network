@@ -14,7 +14,7 @@ const symbolTags = Object({
 });
 
 
-const _submitDataToArseeding = async (data: Uint8Array, signer: any, pay: any, symbol: string, noPay: boolean) => {
+const _submitDataToArseeding = async (data: Uint8Array, signer: any, pay: any, symbol: string, payForArseeding: boolean) => {
   const options = {
     tags: [
       { name: 'k1', value: 'v1' },
@@ -31,8 +31,8 @@ const _submitDataToArseeding = async (data: Uint8Array, signer: any, pay: any, s
 
   // @ts-ignore
   const order = await createAndSubmitItem(data.buffer, options, config);
-  console.log('order', noPay ? 'without pay' : 'with pay', '\n', order);
-  if (noPay) {
+  console.log('order', payForArseeding ? 'with pay' : 'without pay', '\n', order);
+  if (!payForArseeding) {
     return order.itemId;
   }
 
@@ -43,17 +43,17 @@ const _submitDataToArseeding = async (data: Uint8Array, signer: any, pay: any, s
   return order.itemId;
 };
 
-export const submitDataToArseedingMetamask = async (data: Uint8Array, ecdsaPrivateKey: string, symbol: string, noPay: boolean) => {
+export const submitDataToArseedingMetamask = async (data: Uint8Array, ecdsaPrivateKey: string, symbol: string, payForArseeding: boolean) => {
   const signer = new EthereumSigner(ecdsaPrivateKey.substring(2));
   const pay = newEverpayByEcc(ecdsaPrivateKey);
-  return await _submitDataToArseeding(data, signer, pay, symbol, noPay);
+  return await _submitDataToArseeding(data, signer, pay, symbol, payForArseeding);
 };
 
-export const submitDataToArseedingArConnect = async (arweave: Arweave, data: Uint8Array, wallet: any, symbol: string, noPay: boolean) => {
+export const submitDataToArseedingArConnect = async (arweave: Arweave, data: Uint8Array, wallet: any, symbol: string, payForArseeding: boolean) => {
   const signer = new ArweaveSigner(wallet);
   const address = await arweave.wallets.jwkToAddress(wallet);
   const pay = newEverpayByRSA(wallet, address);
-  return await _submitDataToArseeding(data, signer, pay, symbol, noPay);
+  return await _submitDataToArseeding(data, signer, pay, symbol, payForArseeding);
 };
 
 export const getDataFromArseeding = async (transactionId: string): Promise<Uint8Array> => {

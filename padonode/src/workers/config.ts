@@ -110,7 +110,6 @@ export class WorkerConfig extends EnvConfig {
   nodeVersion: string = "v1.0.0";
   logLevel: string = "info";
   logFile: string = "./logs/worker.log";
-  noPay: boolean = false;
 
   aoWarProcessId: string = "xU9zFkq3X2ZQ6olwNVvr1vUWIjc3kXTWr7xKQD6dh10";
 

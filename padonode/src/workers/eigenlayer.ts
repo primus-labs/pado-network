@@ -91,7 +91,7 @@ export class EigenLayerWorker extends AbstractWorker {
       {
         // upload pk to arweave
         let pkData = Uint8Array.from(Buffer.from(this.lheKey.pk, 'hex'));
-        const pkTransactionId = await this.storageClient.submitData(pkData);
+        const pkTransactionId = await this.storageClient.submitData(pkData, true);
         console.log('pkTransactionId ', pkTransactionId);
         const pkTransactionIdHex = ethers.utils.hexlify(stringToUint8Array(pkTransactionId));
         console.log('pkTransactionIdHex ', pkTransactionIdHex);
@@ -161,7 +161,6 @@ export class EigenLayerWorker extends AbstractWorker {
       const tokenShow = "ETH";
       const ethProvider = new ethers.providers.JsonRpcProvider(this.cfg.ethRpcUrl);
       const ethBalance = await ethProvider.getBalance(this.ecdsaWallet.address);
-      console.log('ethBalance  ', Number(ethBalance));
       this.miscMetrics.setBalanceTotal(Number(ethBalance) / 1.0e18, tokenShow);
     }
   }
@@ -297,7 +296,7 @@ export class EigenLayerWorker extends AbstractWorker {
           // console.log("reencrypt reenc_sk=", reenc_sk);
 
           // update result to arweave
-          const resultTransactionId = await this.storageClient.submitData(reenc_sk);
+          const resultTransactionId = await this.storageClient.submitData(reenc_sk, false);
           resultContent = ethers.utils.hexlify(stringToUint8Array(resultTransactionId));
           this.logger.info({
             taskId: task.taskId,
@@ -379,7 +378,6 @@ export async function newEigenLayerWorker(cfg: WorkerConfig, logger: Logger, nod
     worker.ecdsaWallet,
     worker.arWallet,
     worker.arweave,
-    cfg.noPay,
     worker.logger,
     rpcCollector,
   );

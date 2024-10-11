@@ -319,7 +319,6 @@ export async function newAOWorker(cfg: WorkerConfig, logger: Logger, nodeApi: No
     _emptyEcdsaWallet,
     worker.arWallet,
     worker.arweave,
-    cfg.noPay,
     worker.logger,
     rpcCollector,
   );

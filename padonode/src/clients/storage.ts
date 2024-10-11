@@ -29,8 +29,6 @@ export class StorageClient {
     // @ts-ignore
     private readonly arweave: Arweave,
     // @ts-ignore
-    private readonly noPay: boolean,
-    // @ts-ignore
     private readonly logger: Logger,
     // @ts-ignore
     private readonly rpcCollector: RpcCollector,
@@ -39,22 +37,21 @@ export class StorageClient {
 
   /**
    * submit data to ar and return transaction id
-   * @param arweave 
    * @param data 
-   * @param arWallet 
+   * @param payForArseeding 
    * @returns 
    */
-  async submitData(data: Uint8Array): Promise<string> {
+  async submitData(data: Uint8Array, payForArseeding: boolean): Promise<string> {
     const timer_beg = Date.now();
     this.rpcCollector.addRpcRequestTotal("storage.submitData", '1.0');
 
     let transactionId;
     switch (this.storageType) {
       case StorageType.ARSEEDING_ETH:
-        transactionId = await submitDataToArseedingMetamask(data, this.ecdsaWallet.privateKey, 'ethereum-eth', this.noPay);
+        transactionId = await submitDataToArseedingMetamask(data, this.ecdsaWallet.privateKey, 'ethereum-eth', payForArseeding);
         break;
       case StorageType.ARSEEDING_AR:
-        transactionId = await submitDataToArseedingArConnect(this.arweave, data, this.arWallet, 'ethereum-ar', this.noPay);
+        transactionId = await submitDataToArseedingArConnect(this.arweave, data, this.arWallet, 'ethereum-ar', payForArseeding);
         break;
       case StorageType.ARWEAVE:
         transactionId = await submitDataToAR(this.arweave, data, this.arWallet);
@@ -68,7 +65,6 @@ export class StorageClient {
 
   /**
    * Fetch data from ar and return data
-   * @param arweave 
    * @param transactionId 
    * @returns 
    */
@@ -98,7 +94,6 @@ export async function buildStorageClient(
   ecdsaWallet: ethers.Wallet,
   arWallet: any,
   arweave: Arweave,
-  noPay: boolean,
   logger: Logger,
   rpcCollector: RpcCollector,
 ): Promise<StorageClient> {
@@ -107,7 +102,6 @@ export async function buildStorageClient(
     ecdsaWallet,
     arWallet,
     arweave,
-    noPay,
     logger,
     rpcCollector,
   );
