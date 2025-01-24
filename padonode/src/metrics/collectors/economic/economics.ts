@@ -4,7 +4,6 @@ import { ELClient } from '../../../clients/eigenlayer';
 import { AvsClient } from '../../../clients/avs';
 
 export class Collector {
-  private elClient: ELClient;
   private avsClient: AvsClient;
   private logger: Logger;
   private operatorAddr: string;
@@ -23,6 +22,7 @@ export class Collector {
     operatorAddr: string,
     quorumNames: { [key: string]: string }, registry: Registry = new Registry()
   ) {
+    //@ts-ignore
     this.elClient = elClient;
     this.avsName = avsName;
     this.avsClient = avsClient;
@@ -53,14 +53,8 @@ export class Collector {
   }
 
   public async collect(): Promise<void> {
-    // Collect slashingStatus metric
-    const operatorIsFrozen = await this.elClient.operatorIsFrozen(this.operatorAddr);
-    if (operatorIsFrozen === null) {
-      this.logger.error('Failed to get slashing incurred');
-    } else {
-      const operatorIsFrozenValue = operatorIsFrozen ? 1.0 : 0.0;
-      this.slashingStatus.set(operatorIsFrozenValue);
-    }
+    // Collect slashingStatus metric (remove later)
+    this.slashingStatus.set(0.0);
 
     // Collect registeredStake metric
     if (!this.initOperatorId()) {

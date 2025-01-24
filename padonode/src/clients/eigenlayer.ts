@@ -6,7 +6,6 @@ import { ethers } from "ethers";
 import { registryCoordinatorABI } from "../abis/registryCoordinatorABI";
 import { stakeRegistryABI } from "../abis/stakeRegistryABI";
 import { delegationManagerABI } from "../abis/delegationManagerABI";
-import { slasherABI } from "../abis/slasherABI";
 import { strategyManagerABI } from "../abis/strategyManagerABI";
 import { serviceManagerABI } from "../abis/serviceManagerABI";
 import { avsDirectoryABI } from "../abis/avsDirectoryABI";
@@ -23,8 +22,6 @@ export class ELClient {
     // @ts-ignore
     private readonly delegationManager: ethers.Contract,
     // @ts-ignore
-    private readonly slasher: ethers.Contract,
-    // @ts-ignore
     private readonly strategyManager: ethers.Contract,
     // @ts-ignore
     private readonly avsDirectory: ethers.Contract,
@@ -37,11 +34,6 @@ export class ELClient {
   async isOperatorRegistered(operator: string): Promise<boolean> {
     const isOperator: boolean = await this.delegationManager.isOperator(operator);
     return isOperator;
-  }
-
-  async operatorIsFrozen(operator: string): Promise<boolean> {
-    const isFrozen: boolean = await this.slasher.isFrozen(operator);
-    return isFrozen;
   }
 
   async calculateOperatorAVSRegistrationDigestHash(
@@ -112,11 +104,6 @@ export async function buildELClient(
   const delegationManager = new ethers.Contract(delegationManagerAddress, delegationManagerABI, ecdsaWallet);
   // console.log('delegationManager', delegationManager);
 
-  const slasherAddress: string = await delegationManager.slasher();
-  // console.log('slasherAddress', slasherAddress);
-  const slasher = new ethers.Contract(slasherAddress, slasherABI, ecdsaWallet);
-  // console.log('slasher', slasher);
-
   const strategyManagerAddress: string = await delegationManager.strategyManager();
   // console.log('strategyManagerAddress', strategyManagerAddress);
   const strategyManager = new ethers.Contract(strategyManagerAddress, strategyManagerABI, ecdsaWallet);
@@ -134,7 +121,6 @@ export async function buildELClient(
 
   const elClient = new ELClient(
     delegationManager,
-    slasher,
     strategyManager,
     avsDirectory,
     logger,
